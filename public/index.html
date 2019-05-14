@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+</head>
+<body>
+
+        <div id="container">
+            <h3 class="text">Welcome to chat app</h3>
+            <div class="output">
+                <div id="output"></div>
+            </div>
+            <div id="feedback"></div>
+            <input type="text" id="handle" placeholder="enter the handle">
+            <input type="text" id="message" placeholder="enter the message">
+            <button id="send" class="button">Send</button>
+        </div>
+        
+        <script>
+            var socket = io();
+            var socket = io.connect('http://localhost:5000');
+
+            var message = document.getElementById('message');
+            var handle = document.getElementById('handle');
+            var send = document.getElementById('send');
+            var output = document.getElementById('output');
+            var feedback = document.getElementById('feedback');
+
+            send.addEventListener('click', function(){
+                socket.emit('chat', {
+                    handle: handle.value,
+                    message: message.value
+                })
+            });
+
+            message.addEventListener('keypress', function(){
+            socket.emit('feed', handle.value);
+            });
+
+            socket.on('chat', function(data){
+                feedback.innerHTML = '';
+                output.innerHTML += '<p><strong>' + data.handle + ': </strong>' + data.message + '</p>';
+                console.log(data);
+            });
+
+            socket.on('feed', function(data){
+            feedback.innerHTML = '<em>' + data + '</em>' + 'is typing...';
+            });
+        </script>
+</body>
+</html>
